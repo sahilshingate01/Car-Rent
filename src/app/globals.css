@@ -1,0 +1,47 @@
+@import "tailwindcss";
+@import "./rekeep-style.css";
+
+/* Extra utilities for smooth interactive experience */
+.selection-orange::selection {
+  background: var(--brand-orange);
+  color: #FFFFFF;
+}
+
+/* Modal and sound button animations */
+.sound-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: #FFFFFF;
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-pill);
+  color: var(--brand-black);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.28s var(--ease-smooth);
+  cursor: pointer;
+}
+
+.sound-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 84, 0, 0.3);
+}
+
+.modal-backdrop-blur {
+  background: rgba(15, 30, 19, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Force hide Next.js dev watermark & indicator badge */
+nextjs-portal,
+#nextjs-dev-indicator,
+[data-nextjs-dev-indicator],
+[data-nextjs-toast] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
