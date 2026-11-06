@@ -63,6 +63,8 @@ export default function Home() {
     setSoundActive(next);
   };
 
+  const lenisRef = useRef<Lenis | null>(null);
+
   // Open booking modal
   const handleOpenBooking = (car?: Car) => {
     soundFx.playThrottle();
@@ -71,12 +73,20 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  // Scroll to section
+  // Scroll to section with Lenis kinetic smoothing
   const scrollToId = (id: string) => {
     soundFx.playClick();
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(el, {
+          offset: -20,
+          duration: 1.4,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -98,11 +108,31 @@ export default function Home() {
     });
 
     lenis.on("scroll", ScrollTrigger.update);
+    lenisRef.current = lenis;
     const updateTicker = (time: number) => {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(updateTicker);
     gsap.ticker.lagSmoothing(0);
+
+    // Smooth scroll for all internal anchor links
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest("a[href^='#']");
+      if (!target) return;
+      const href = target.getAttribute("href");
+      if (!href || href === "#" || href === "#!") return;
+      const el = document.querySelector(href);
+      if (el) {
+        e.preventDefault();
+        soundFx.playClick();
+        lenis.scrollTo(el as HTMLElement, {
+          offset: -20,
+          duration: 1.4,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      }
+    };
+    document.addEventListener("click", handleAnchorClick);
 
     // Navbar scroll listener
     const handleScroll = () => {
@@ -426,7 +456,9 @@ export default function Home() {
     return () => {
       ctx.revert();
       gsap.ticker.remove(updateTicker);
+      document.removeEventListener("click", handleAnchorClick);
       lenis.destroy();
+      lenisRef.current = null;
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
